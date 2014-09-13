@@ -56,8 +56,8 @@ public class Server {
 		thread2.start();
 		System.out.println("둘받음 : 연결함");
 
-		String firstmessage = STATUS_START + " " + FIRST;
-		String seccondmessage = STATUS_START + " " + SECOND;
+		String firstmessage = STATUS_START + "&" + FIRST;
+		String seccondmessage = STATUS_START + "&" + SECOND;
 		System.out.println(firstmessage);
 		System.out.println(seccondmessage);
 		reciever.sendMessage(firstmessage);

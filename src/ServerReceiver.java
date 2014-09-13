@@ -45,7 +45,7 @@ public class ServerReceiver implements Runnable {
 		while (datain != null) {
 			try {
 				message = datain.readUTF();
-				messageSplit = message.split(" ");
+				messageSplit = message.split("&");
 				doServerJob(Integer.parseInt(messageSplit[0]));
 				System.out.println(message);
 				if (message != "")
@@ -64,7 +64,7 @@ public class ServerReceiver implements Runnable {
 				e.printStackTrace();
 			}
 			if (!end)
-				dataout.writeUTF("103 ");
+				dataout.writeUTF("103&");
 			datain.close();
 			dataout.close();
 			socket.close();
