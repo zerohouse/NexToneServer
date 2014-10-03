@@ -1,77 +1,61 @@
-import java.io.IOException;
-
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.Scanner;
 
 public class Server {
 
-	private static final int STATUS_START = 0;
-	private static final int FIRST = 1;
-	private static final int SECOND = 2;
-
+	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 
+		Scanner scan = new Scanner(System.in);
+
 		// 포트를 지정한다.
-		int port = 13333;
-		
-		try {
-			ServerSocket serversocket = new ServerSocket(port);
-			System.out.println("기다림...ver2");
+		SocketReciever receiver = new SocketReciever();
+		Thread receivethread = new Thread(receiver);
+		receivethread.start();
 
-			while (true) {
-				makeConnection(serversocket, null);
+		while (true) {
+			System.out.print("command> ");
+			Do(scan.nextLine());
+		}
+
+	}
+
+	private static void Do(String input) {
+
+		String doing[] = null;
+		String type = null;
+		if (input.contains(" ")) {
+			doing = input.split(" ");
+			if(doing.length==0)
+				return;
+			type = doing[0];
+		} else {
+			type = input;
+		}
+
+		switch (type) {
+		case "?":
+			System.out.println("sockets : 연결된 소켓 출력");
+			break;
+
+		case "sockets":
+			ConnectedSocket.printSockets();
+			break;
+
+		case "send":
+			try {
+				ConnectedSocket.id(Integer.parseInt(doing[1])).sendMessage(
+						doing[2]);
+
+			} catch (Exception e) {
+				System.out
+						.println("커맨드 입력형식이 잘못되었습니다.\n형식 : send [socketid] [message]");
 			}
+			break;
 
-		} catch (IOException e) {
-			e.printStackTrace();
+		default:
+			System.out.println("해당 커맨드 없음.");
+
 		}
 
-	}
-
-	private static void makeConnection(ServerSocket serversocket, Socket socket)
-			throws IOException {
-		Socket socket1;
-		Socket socket2;
-		Thread thread1;
-		Thread thread2;
-		if (socket == null)
-			socket1 = serversocket.accept();
-		else
-			socket1 = socket;
-
-		System.out.println("하나받음" + socket1.getInetAddress().toString());
-
-		socket2 = serversocket.accept();
-		if (!isAvailable(socket1)) {
-			makeConnection(serversocket, socket2);
-			return;
-		}
-		ServerReceiver reciever = new ServerReceiver(socket1, socket2);
-
-		thread1 = new Thread(reciever);
-		thread1.start();
-
-		ServerReceiver reciever2 = new ServerReceiver(socket2, socket1);
-		thread2 = new Thread(reciever2);
-		thread2.start();
-		System.out.println("둘받음 : 연결함");
-
-		String firstmessage = STATUS_START + "&" + FIRST;
-		String seccondmessage = STATUS_START + "&" + SECOND;
-		System.out.println(firstmessage);
-		System.out.println(seccondmessage);
-		reciever.sendMessage(firstmessage);
-		reciever2.sendMessage(seccondmessage);
-	}
-
-	private static boolean isAvailable(Socket socket) {
-		return true; // 소켓 유효성 판단 논리 필요.
-		/*
-		 * OutputStream out; InputStream in; try { in = socket.getInputStream();
-		 * 
-		 * if (in.read() == -1) { System.out.println("리턴 펄스"); return false; }
-		 * return true; } catch (IOException e) { System.out.println("죽었다.");
-		 * e.printStackTrace(); return false; }
-		 */
 	}
 }

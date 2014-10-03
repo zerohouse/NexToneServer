@@ -5,26 +5,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class ServerReceiver implements Runnable {
+public class Connecter implements Runnable {
 
 	DataInputStream datain;
 	DataOutputStream dataout;
 	Socket socket;
 	boolean end = false;
-	
 
-
-	ServerReceiver(Socket socket, Socket socketout) {
+	Connecter(Socket socket, Socket socketout) {
 		try {
 			this.socket = socket;
 			InputStream in = socket.getInputStream();
 			OutputStream out = socketout.getOutputStream();
 			datain = new DataInputStream(in);
 			dataout = new DataOutputStream(out);
-			
-			
-			
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -65,9 +60,13 @@ public class ServerReceiver implements Runnable {
 			}
 			if (!end)
 				dataout.writeUTF("103&");
+
+			ConnectedSocket.game -= 2;
+
 			datain.close();
 			dataout.close();
 			socket.close();
+
 			System.out.println("소켓이 닫혔습니다.");
 			System.out.println("에러 : 트루");
 		} catch (IOException e) {
